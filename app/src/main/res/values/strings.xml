@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Твоя погода!</string>
+    <string name="logo">Температура в городе:</string>
+    <string name="user_field">Введите город</string>
+    <string name="main_button">Найти</string>
+    <string name="no_user_input">Введите текст</string>
+    <string name="no_city">Некорректный ввод города</string>
+    <string name="Moscow">Москва</string>
+    <string name="SaintPetersburg">Санкт Петербург</string>
+</resources>
