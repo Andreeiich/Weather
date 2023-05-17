@@ -7,4 +7,23 @@
     <string name="no_city">Некорректный ввод города</string>
     <string name="Moscow">Москва</string>
     <string name="SaintPetersburg">Санкт Петербург</string>
+    <string name="space"> </string>
+    <string name="OK">OK</string>
+    <string name="Cancel">Отмена</string>
+    <string name="input_city">Введите город</string>
+    <string name="cur_temp">Текущая температура:</string>
+    <string name="fel_temp">Ощущается как:</string>
+    <string name="partly_cloudy">переменная облачность</string>
+    <string name="clean">ясно</string>
+    <string name="cloudy_with_space">облачно с прояснениями</string>
+    <string name="main">main</string>
+    <string name="temp">temp</string>
+    <string name="feels_like">feels_like</string>
+    <string name="weather">weather</string>
+    <string name="description">description</string>
+    <string name="url">https://api.openweathermap.org/data/2.5/weather?q=</string>
+    <string name="appid">&amp;appid=</string>
+    <string name="units_and_lang">"&amp;units=metric&amp;lang=ru"</string>
+    <string name="Connect">Connect</string>
+
 </resources>
