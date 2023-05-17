@@ -10,4 +10,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0d88e3</color>
     <color name="textColor">#fff</color>
+    <color name="backgroundUserCity">#51abf0</color>
 </resources>

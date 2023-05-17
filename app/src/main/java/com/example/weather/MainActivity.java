@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.JsonReader;
@@ -24,6 +26,8 @@ import android.widget.Toast;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.internal.StaticLayoutBuilderConfigurer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     final Context context = this;
     private TextView final_text;
 
+    private Resources resources;
+
     @SuppressLint({"ResourceAsColor", "MissingInflatedId"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,25 +73,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (userField.getText().toString().trim().equals("")) {
+                if (userField.getText().toString().trim().equals(getResources().getString(R.string.space))) {
                     Toast.makeText(MainActivity.this, R.string.no_user_input, Toast.LENGTH_LONG).show();//
                     // всплывающее окно должно быть показано на странице MainActivity.Показывает сообщение, 3-1 параметр -длительность
                 }//trim -обрезаем пробелы в строке и проверяем на пустую строку
                 else {
                     String city = userField.getText().toString();
-                    String key = "5e1913d6b50fb4cbbcb9ae046481e0bf";
-                    String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + key + "&units=metric&lang=ru";
-
-                    try {
-                        Thread thread = new Thread(new GetUrlData(city, key, url), "Connect");
-                        thread.start();
-                    } catch (RuntimeException e) {
-                        Toast.makeText(MainActivity.this, R.string.no_city, Toast.LENGTH_LONG).show();//
-
-                    }
+                    sendRequest(city);
                 }
             }
         });//делаем обработчик события на кнопку;
+
+    }
+
+
+    public void sendRequest(String city) {
+
+        String key = BuildConfig.key;
+        String url = getResources().getString(R.string.url) + city + getResources().getString(R.string.appid) + key + getResources().getString(R.string.units_and_lang);
+
+        try {
+            Thread thread = new Thread(new FetchWeatherData(city, key, url), getResources().getString(R.string.Connect));
+            thread.start();
+        } catch (RuntimeException e) {
+            Toast.makeText(MainActivity.this, R.string.no_city, Toast.LENGTH_LONG).show();//
+        }
 
     }
 
@@ -102,23 +114,11 @@ public class MainActivity extends AppCompatActivity {
         int id = textView.getId();
 
         String city = "";
-        String key = "5e1913d6b50fb4cbbcb9ae046481e0bf";
-        String url = "";
 
         if (id == R.id.final_text) {
             city = textView.getText().toString();
-
-            url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + key + "&units=metric&lang=ru";
-            Thread thread = new Thread(new GetUrlData(city, key, url), "Connect");
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
+            sendRequest(city);
         }
-
 
     }
 
@@ -128,33 +128,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         String city = "";
-        String key = "5e1913d6b50fb4cbbcb9ae046481e0bf";
-        String url = "";
 
         if (id == R.id.Moscow) {
             city = getString(R.string.Moscow);
-            url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + key + "&units=metric&lang=ru";
-            Thread thread = new Thread(new GetUrlData(city, key, url), "Connect");
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            sendRequest(city);
         }
         if (id == R.id.SaintPetersburg) {
             city = getString(R.string.SaintPetersburg);
-
-            url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + key + "&units=metric&lang=ru";
-            Thread thread = new Thread(new GetUrlData(city, key, url), "Connect");
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            sendRequest(city);
         }
-
 
         if (id == R.id.newCity) {
             final_text = (TextView) findViewById(R.id.final_text);
@@ -174,16 +156,17 @@ public class MainActivity extends AppCompatActivity {
             //Настраиваем сообщение в диалоговом окне:
             mDialogBuilder
                     .setCancelable(false)
-                    .setPositiveButton("OK",
+                    .setPositiveButton(R.string.OK,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     //Вводим текст и отображаем в строке ввода на основном экране:
                                     final_text.setText(userInput.getText());
-                                    int col = Color.parseColor("#51abf0");
+                                    resources = getResources();
+                                    int col = resources.getColor(R.color.backgroundUserCity);
                                     final_text.setBackgroundColor(col);
                                 }
                             })
-                    .setNegativeButton("Отмена",
+                    .setNegativeButton(R.string.Cancel,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
@@ -202,13 +185,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class GetUrlData implements Runnable {
+    private class FetchWeatherData implements Runnable {
 
         private String city = "";
         private String key = "";
         private String urls = "";
 
-        public GetUrlData(String city, String key, String urls) {
+        public FetchWeatherData(String city, String key, String urls) {
             this.city = city;
             this.key = key;
             this.urls = urls;
@@ -263,38 +246,38 @@ public class MainActivity extends AppCompatActivity {
 
             if (stream != null) {
                 try {
-                    if (city.equals("") && urls.equals("") && key.equals("")) {
-                        Toast.makeText(MainActivity.this, "Введите город ", Toast.LENGTH_LONG).show();
+                    if (city.length() == 0 && urls.length() == 0 && key.length() == 0) {
+                        Toast.makeText(MainActivity.this, R.string.input_city, Toast.LENGTH_LONG).show();
                     } else {
                         JSONObject jsonObject = new JSONObject(stringBuffer.toString());
-                        int temp = (int) jsonObject.getJSONObject("main").getDouble("temp");
-                        result.setText("Текущая температура: " + temp);
-                        int approximately = (int) jsonObject.getJSONObject("main").getDouble("feels_like");
-                        resultFeeling.setText("Ощущается как: " + approximately);
+                        int temp = (int) jsonObject.getJSONObject(getResources().getString(R.string.main)).getDouble(getResources().getString(R.string.temp));
+                        result.setText(getResources().getString(R.string.cur_temp) + temp);
+                        int approximately = (int) jsonObject.getJSONObject(getResources().getString(R.string.main)).getDouble(getResources().getString(R.string.feels_like));
+                        resultFeeling.setText(getResources().getString(R.string.fel_temp) + approximately);
 
                         String value1 = "";
-                        JSONArray jsonArray = jsonObject.getJSONArray("weather");
+                        JSONArray jsonArray = jsonObject.getJSONArray(getResources().getString(R.string.weather));
                         for (int i = 0; i < (jsonArray.length()); i++) {
                             JSONObject json_obj = jsonArray.getJSONObject(i);
-                            value1 = json_obj.getString("description");
+                            value1 = json_obj.getString(getResources().getString(R.string.description));
                             conditionSky.setText(value1);
 
                         }
-                        if (value1.equals("переменная облачность")) {
+                        if (value1.equals((String) getResources().getString(R.string.partly_cloudy))) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     imageView.setImageResource(R.drawable.oblako);
                                 }
                             });
-                        } else if (value1.equals("ясно")) {
+                        } else if (value1.equals((String) getResources().getString(R.string.clean))) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     imageView.setImageResource(R.drawable.sun);
                                 }
                             });
-                        } else if (value1.equals("облачно с прояснениями")) {
+                        } else if (value1.equals((String) getResources().getString(R.string.cloudy_with_space))) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
