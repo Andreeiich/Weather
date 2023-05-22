@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
                     url = getResources().getString(R.string.url) + city + getResources().getString(R.string.appid) + key + getResources().getString(R.string.units_and_lang);
                     mainPresenter.handleSendRequest(city, key, url);
                 }
-
             }
         }
 
