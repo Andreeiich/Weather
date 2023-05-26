@@ -2,50 +2,29 @@ package com.example.weather;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
-import android.util.JsonReader;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.internal.StaticLayoutBuilderConfigurer;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class MainActivity extends AppCompatActivity implements MainPresenter.View {
+
 
     private EditText userField;
     private Button mainButton;
@@ -57,12 +36,9 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     private TextView final_text;
     private Resources resources;
     private MainPresenter mainPresenter;
-
     private String key;
-    private String url;
-
     private List<Integer> listId;
-
+    private   ProgressBar progressBar;
     @SuppressLint({"ResourceAsColor", "MissingInflatedId"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,30 +63,32 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         MainModel model = new MainModel();
         mainPresenter = new MainPresenter(model);
         mainPresenter.attachView(this);
-
+        progressBar=findViewById(R.id.progressBar);
         mainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
 
                 if (userField.getText().toString().trim().equals(getResources().getString(R.string.space))) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    userField.setText("");
+                    result.setText(R.string.space);
+                    resultFeeling.setText(R.string.space);
+                    conditionSky.setText("");
                     Toast.makeText(MainActivity.this, R.string.no_user_input, Toast.LENGTH_LONG).show();//
                     // всплывающее окно должно быть показано на странице MainActivity.Показывает сообщение, 3-1 параметр -длительность
                 }//trim -обрезаем пробелы в строке и проверяем на пустую строку
                 else {
 
-                    // result.setText("");
-                    //resultFeeling.setText("");
-                    //conditionSky.setText("");
                     userField.refreshDrawableState();
                     result.refreshDrawableState();
                     resultFeeling.refreshDrawableState();
                     imageView.setImageDrawable(null);
 
                     String city = userField.getText().toString();
-                    // sendRequest(city);
                     key = BuildConfig.key;
-                    url = getResources().getString(R.string.url) + city + getResources().getString(R.string.appid) + key + getResources().getString(R.string.units_and_lang);
-                    mainPresenter.handleSendRequest(city, key, url);
+                    mainPresenter.handleSendRequest(city, key,context);
+
                 }
             }
         });//делаем обработчик события на кнопку;
@@ -171,8 +149,7 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
                 } else {
                     city = (String) item.getTitle();
                     key = BuildConfig.key;
-                    url = getResources().getString(R.string.url) + city + getResources().getString(R.string.appid) + key + getResources().getString(R.string.units_and_lang);
-                    mainPresenter.handleSendRequest(city, key, url);
+                    mainPresenter.handleSendRequest(city, key,context);
                 }
             }
         }
@@ -189,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         if (id == R.id.final_text) {
             city = textView.getText().toString();
             key = BuildConfig.key;
-            url = getResources().getString(R.string.url) + city + getResources().getString(R.string.appid) + key + getResources().getString(R.string.units_and_lang);
-            mainPresenter.handleSendRequest(city, key, url);
+            mainPresenter.handleSendRequest(city, key,context);
         }
     }
 
@@ -198,18 +174,20 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     @Override
     public void updateWeatherInfo(int temperature, int approximatelyTemperature, String conditionSkym, String image) {
 
-
+        progressBar.setVisibility(View.INVISIBLE);
         result.setText(getResources().getString(R.string.cur_temp) + temperature);
         resultFeeling.setText(getResources().getString(R.string.fel_temp) + approximatelyTemperature);
         conditionSky.setText(conditionSkym);
 
-        if (image.equals((String) getResources().getString(R.string.partly_cloudy))) {
+       if (image.equals((String) getResources().getString(R.string.partly_cloudy)) || image.equals((String)getResources().getString(R.string.some_cloudy))) {
             imageView.setImageResource(R.drawable.oblako);
         } else if (image.equals((String) getResources().getString(R.string.clean))) {
             imageView.setImageResource(R.drawable.sun);
         } else if (image.equals((String) getResources().getString(R.string.cloudy_with_space))) {
             imageView.setImageResource(R.drawable.aun_and_cloud);
-        } else {
+        } else if (image.equals((String)getResources().getString(R.string.rain))) {
+           imageView.setImageResource(R.drawable.some_rain);
+       } else {
             imageView.setImageDrawable(null);
         }
 
@@ -217,16 +195,23 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
 
     @Override
     public void wrongData() {
+        progressBar.setVisibility(View.INVISIBLE);
         userField.setText("");
         result.setText(R.string.space);
         resultFeeling.setText(R.string.space);
         conditionSky.setText("");
-        Toast.makeText(MainActivity.this, R.string.no_city, Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void showError(String error) {
+        progressBar.setVisibility(View.INVISIBLE);
+        conditionSky.setText(error);
+        Toast.makeText(MainActivity.this, R.string.error_request, Toast.LENGTH_LONG).show();
+    }
 
     // TODO Dependency Injection
-    // TODO Retrofit
+
 
 
 }
