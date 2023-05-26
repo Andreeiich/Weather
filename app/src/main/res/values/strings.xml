@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Твоя погода!</string>
     <string name="logo">Температура в городе:</string>
     <string name="user_field">Введите город</string>
@@ -16,6 +16,7 @@
     <string name="partly_cloudy">переменная облачность</string>
     <string name="clean">ясно</string>
     <string name="cloudy_with_space">облачно с прояснениями</string>
+    <string name="rain">небольшой проливной дождь</string>
     <string name="main">main</string>
     <string name="temp">temp</string>
     <string name="feels_like">feels_like</string>
@@ -25,5 +26,10 @@
     <string name="appid">&amp;appid=</string>
     <string name="units_and_lang">"&amp;units=metric&amp;lang=ru"</string>
     <string name="Connect">Connect</string>
+    <string name="some_cloudy">небольшая облачность</string>
+    <string name="error">Некорректные данные, повторите запрос</string>
+    <string name="error_request">Ошибка запроса</string>
+    <string name="lang">ru</string>
+    <string name="units">metric</string>
 
 </resources>

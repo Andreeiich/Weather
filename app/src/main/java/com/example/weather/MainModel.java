@@ -1,36 +1,25 @@
 package com.example.weather;
 
 
-import android.annotation.SuppressLint;
+import com.example.weather.WeatherModelData.MainData;
+import com.example.weather.service.ServiceWeather;
+import com.example.weather.repository.GetDataAPI;
 
-import com.example.weather.service.WeatherService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import android.content.Context;
 
 public class MainModel {
-
-
-    WeatherService weatherService = new WeatherService();
-
-    private int temperature;
-    private int approximatelyTemperature;
-    private String conditionSky;
+    private Context context;
     private String key;
-    private String url;
-    String image;
-
-    private boolean statusCity = true;
-
-    public boolean isStatusCity() {
-        return statusCity;
+    public Context getContext() {
+        return context;
     }
-
-    public void setStatusCity(boolean statusCity) {
-        this.statusCity = statusCity;
+    public void setContext(Context context) {
+        this.context = context;
     }
-
     public String getKey() {
         return key;
     }
@@ -39,82 +28,40 @@ public class MainModel {
         this.key = key;
     }
 
-    public String getUrl() {
-        return url;
-    }
+    public synchronized void sendRequest(String city, onResult onResult) throws RuntimeException {
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+        ServiceWeather serviceWeather = new ServiceWeather();
 
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    public int getApproximatelyTemperature() {
-        return approximatelyTemperature;
-    }
-
-    public void setApproximatelyTemperature(int approximatelyTemperature) {
-        this.approximatelyTemperature = approximatelyTemperature;
-    }
-
-    public String getConditionSky() {
-        return conditionSky;
-    }
-
-    public void setConditionSky(String conditionSky) {
-        this.conditionSky = conditionSky;
-    }
-
-
-    public void sendRequest(String city) throws RuntimeException {
-
-        try {
-            Thread thread = new Thread(new FetchWeatherData(city, key, url), /*getResources().getString(R.string.Connect)*/"Connect");
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                thread.interrupt();
+        GetDataAPI getDataAPI = serviceWeather.getRetrofit().create(GetDataAPI.class);
+        getDataAPI.getDataWeather(city, getKey(), getContext().getResources().getString(R.string.units),
+                getContext().getResources().getString(R.string.lang)).enqueue(new Callback<MainData>() {
+            @Override
+            public void onResponse(Call<MainData> call, Response<MainData> response) {
+                MainData dataWeather = response.body();
+                if (response.isSuccessful()) {
+                    onResult.func(dataWeather);
+                }
+                if (response.code() == 404) {
+                    MainData errorData = new MainData();
+                    errorData.setStatus(false);
+                    onResult.func(errorData);
+                }
             }
-        } catch (RuntimeException e) {
-            throw new RuntimeException();
-        }
-    }
 
-    private class FetchWeatherData implements Runnable {
-
-        private String city = "";
-        private String key = "";
-        private String urls = "";
-
-        public FetchWeatherData(String city, String key, String urls) {
-            this.city = city;
-            this.key = key;
-            this.urls = urls;
-        }
-
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void run() {
-
-            List<String> list = new LinkedList<>();
-            try {
-                list = weatherService.getNetworkData(city, key, urls);
-                setTemperature(Integer.parseInt(list.get(0)));
-                setApproximatelyTemperature(Integer.parseInt(list.get(1)));
-                setConditionSky(list.get(2));
-                image = list.get(2);
-            } catch (IOException e) {
-                setStatusCity(false);
+            @Override
+            public void onFailure(Call<MainData> call, Throwable t) {
+                MainData mainData = new MainData();
+                mainData.setErrorRequest(true);
+                mainData.setError(t.getMessage());
+                onResult.func(mainData);
             }
-        }
+        });
 
     }
+
+    interface onResult {
+        void func(MainData weatherData);
+
+    }
+
 }
