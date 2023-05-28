@@ -20,8 +20,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.weather.AppModule.AppModule;
+import com.example.weather.AppModule.DaggerAppModule;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
+import dagger.internal.DaggerCollections;
+import dagger.internal.DaggerGenerated;
 
 public class MainActivity extends AppCompatActivity implements MainPresenter.View {
 
@@ -35,16 +43,20 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     final Context context = this;
     private TextView final_text;
     private Resources resources;
-    private MainPresenter mainPresenter;
+    @Inject
+    MainPresenter mainPresenter;
     private String key;
     private List<Integer> listId;
     private   ProgressBar progressBar;
+
     @SuppressLint({"ResourceAsColor", "MissingInflatedId"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainPresenter = new MainPresenter(this);
+        AppModule appModule= DaggerAppModule.create();
+        mainPresenter =appModule.mainPresenter();
+        mainPresenter.attachView(this);
         init();
     }
 
@@ -60,10 +72,8 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         resultFeeling = findViewById(R.id.resultFeeling);
         conditionSky = findViewById(R.id.conditionSky);
         imageView = findViewById(R.id.imageView);
-        MainModel model = new MainModel();
-        mainPresenter = new MainPresenter(model);
-        mainPresenter.attachView(this);
         progressBar=findViewById(R.id.progressBar);
+
         mainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

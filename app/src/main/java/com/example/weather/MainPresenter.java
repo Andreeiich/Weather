@@ -2,6 +2,10 @@ package com.example.weather;
 
 import android.content.Context;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class MainPresenter {
     private MainActivity activity;
     private final MainModel model;
@@ -9,14 +13,14 @@ public class MainPresenter {
     public void attachView(MainActivity mainActivity) {
         activity = mainActivity;
     }
-
+    @Inject
     public MainPresenter(MainModel model) {
         this.model = model;
     }
 
     public MainPresenter(View view) {
         this.model = new MainModel();
-        this.view = view;
+        this.view = view; //TODO Использовать ли View?
     }
 
     public void handleSendRequest(String city, String key, Context context) {
