@@ -11,9 +11,16 @@ import retrofit2.Response;
 
 import android.content.Context;
 
+import javax.inject.Inject;
+
 public class MainModel {
     private Context context;
     private String key;
+
+    @Inject
+    public MainModel() {
+    }
+
     public Context getContext() {
         return context;
     }
