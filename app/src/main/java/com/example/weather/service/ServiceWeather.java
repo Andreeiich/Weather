@@ -11,14 +11,15 @@ public class ServiceWeather {
     private static ServiceWeather mInstance;
     private Retrofit retrofit;
 
-    public ServiceWeather(){
+    public ServiceWeather() {
         retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();//без RxJava
     }
 
-   public GetDataAPI init(){
-        GetDataAPI getDataAPI=retrofit.create(GetDataAPI.class);
+    public GetDataAPI init() {
+        GetDataAPI getDataAPI = retrofit.create(GetDataAPI.class);
         return getDataAPI;
     }
+
     public static ServiceWeather getInstance() {
         if (mInstance == null) {
             mInstance = new ServiceWeather();

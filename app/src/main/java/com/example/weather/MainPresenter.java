@@ -10,9 +10,11 @@ public class MainPresenter {
     private MainActivity activity;
     private final MainModel model;
     private View view;
+
     public void attachView(MainActivity mainActivity) {
         activity = mainActivity;
     }
+
     @Inject
     public MainPresenter(MainModel model) {
         this.model = model;
@@ -23,34 +25,22 @@ public class MainPresenter {
         this.view = view; //TODO Использовать ли View?
     }
 
-    public void handleSendRequest(String city, String key, Context context) {
+    public void handleSendRequest(String city,String key,String units,String language) {
         model.setKey(key);
-        model.setContext(context);
 
-        model.sendRequest(city, (weatherData) -> {
+        model.sendRequest(city,units,language,(weatherData) -> {
             MainActivity activity1 = this.activity;
 
             if (!weatherData.isStatus()) {
                 weatherData.setStatus(true);
-                this.activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        activity1.wrongData();
-                    }
-                });
+                activity.wrongData();
             } else if (weatherData.isErrorRequest()) {
-                this.activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        activity1.showError(weatherData.getError());
-                    }
-                });
-
+                activity.showError(weatherData.getError());
             } else {
                 this.activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        activity1.updateWeatherInfo((int) weatherData.getMain().getTemp(), (int) weatherData.getMain().getFeels_like(), weatherData.getArrayList().get(0).getDescription(),
+                        activity1.updateWeatherInfo((int) weatherData.getMain().getTemp(),(int) weatherData.getMain().getFeels_like(),weatherData.getArrayList().get(0).getDescription(),
                                 weatherData.getArrayList().get(0).getDescription());
                     }
                 });
@@ -61,7 +51,7 @@ public class MainPresenter {
     }
 
     public interface View {
-        void updateWeatherInfo(int temperature, int approximatelyTemperature, String conditionSky, String image);
+        void updateWeatherInfo(int temperature,int approximatelyTemperature,String conditionSky,String image);
 
         void wrongData();
 

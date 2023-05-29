@@ -6,6 +6,7 @@ import com.example.weather.MainPresenter;
 import javax.inject.Singleton;
 
 import dagger.Component;
+
 @Singleton
 @Component
 public interface AppModule {

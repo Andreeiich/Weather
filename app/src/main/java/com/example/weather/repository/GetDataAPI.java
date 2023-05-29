@@ -9,5 +9,5 @@ import retrofit2.http.Query;
 
 public interface GetDataAPI {
     @GET("data/2.5/weather?")
-    Call<MainData>  getDataWeather(@Query("q") String city, @Query("appid") String appid, @Query("units") String units, @Query("lang") String lang);
+    Call<MainData> getDataWeather(@Query("q") String city,@Query("appid") String appid,@Query("units") String units,@Query("lang") String lang);
 }
