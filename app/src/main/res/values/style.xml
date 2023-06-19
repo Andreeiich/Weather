@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- стиль для заднего фона -->
-    <style name="MyStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!--<style name="MyStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">-->
+    <style name="MyTheme.ActionBar." parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">@color/blue</item>
-
+        <item name="android:actionBarStyle">@style/MyTheme.ActionBar</item>
+        <item name="android:titleTextColor">@color/white</item>
     </style>
     
     
