@@ -8,7 +8,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="blue">#0d88e3</color>
+    <color name="blue">#4EA3DB</color>
     <color name="textColor">#fff</color>
     <color name="backgroundUserCity">#51abf0</color>
+    <color name="backgroundElem">#6eb3e1</color>
 </resources>

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,17 +13,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.weather.AppModule.AppModule;
 import com.example.weather.AppModule.DaggerAppModule;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,7 +40,23 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     private TextView result;
     private TextView resultFeeling;
     private TextView conditionSky;
+    private TextView editTextTime1;
+    private TextView editTextTime2;
+    private TextView editTextTime3;
+    private TextView editTextTime4;
+    private TextView editTextTime5;
+    private TextView textView1;
+    private TextView textView2;
+    private TextView textView3;
+    private TextView textView4;
+    private TextView textView5;
+    private TextView logo;
     private ImageView imageView;
+    private ImageView image1;
+    private ImageView image2;
+    private ImageView image3;
+    private ImageView image4;
+    private ImageView image5;
     final Context context = this;
     private TextView final_text;
     private Resources resources;
@@ -46,11 +65,24 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     private String key;
     private List<Integer> listId;
     private ProgressBar progressBar;
+    private LinearLayout linearLayout;
+    private LinearLayout cont1;
+    private LinearLayout cont2;
+    private LinearLayout cont3;
+    private LinearLayout cont4;
+    private LinearLayout cont5;
+    ArrayList<LinearLayout> listCont;
+    ArrayList<TextView> editTextArr;
+    ArrayList<TextView> textViewArr;
+    ArrayList<ImageView> imageArr;
+    private Calendar time;
 
     @SuppressLint({"ResourceAsColor","MissingInflatedId"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.title_app_layout);
         setContentView(R.layout.activity_main);
         AppModule appModule = DaggerAppModule.create();
         mainPresenter = appModule.mainPresenter();
@@ -58,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         init();
     }
 
+    @SuppressLint("ResourceAsColor")
     public void init() {
         listId = new ArrayList<>();
         listId.add(R.id.Moscow);
@@ -70,6 +103,53 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         conditionSky = findViewById(R.id.conditionSky);
         imageView = findViewById(R.id.imageView);
         progressBar = findViewById(R.id.progressBar);
+        linearLayout = findViewById(R.id.fieldFelling);
+        cont1 = findViewById(R.id.cont1);
+        cont2 = findViewById(R.id.cont2);
+        cont3 = findViewById(R.id.cont3);
+        cont4 = findViewById(R.id.cont4);
+        cont5 = findViewById(R.id.cont5);
+        listCont = new ArrayList<>();
+        listCont.add(cont1);
+        listCont.add(cont2);
+        listCont.add(cont3);
+        listCont.add(cont4);
+        listCont.add(cont5);
+        editTextTime1 = findViewById(R.id.editTextTime1);
+        editTextTime2 = findViewById(R.id.editTextTime2);
+        editTextTime3 = findViewById(R.id.editTextTime3);
+        editTextTime4 = findViewById(R.id.editTextTime4);
+        editTextTime5 = findViewById(R.id.editTextTime5);
+        editTextArr = new ArrayList<>();
+        editTextArr.add(editTextTime1);
+        editTextArr.add(editTextTime2);
+        editTextArr.add(editTextTime3);
+        editTextArr.add(editTextTime4);
+        editTextArr.add(editTextTime5);
+        textView1 = findViewById(R.id.textView1);
+        textView2 = findViewById(R.id.textView2);
+        textView3 = findViewById(R.id.textView3);
+        textView4 = findViewById(R.id.textView4);
+        textView5 = findViewById(R.id.textView5);
+        textViewArr = new ArrayList<>();
+        textViewArr.add(textView1);
+        textViewArr.add(textView2);
+        textViewArr.add(textView3);
+        textViewArr.add(textView4);
+        textViewArr.add(textView5);
+        image1 = findViewById(R.id.image1);
+        image2 = findViewById(R.id.image2);
+        image3 = findViewById(R.id.image3);
+        image4 = findViewById(R.id.image4);
+        image5 = findViewById(R.id.image5);
+        imageArr = new ArrayList<>();
+        imageArr.add(image1);
+        imageArr.add(image2);
+        imageArr.add(image3);
+        imageArr.add(image4);
+        imageArr.add(image5);
+        logo = findViewById(R.id.logo);
+
         mainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,8 +204,7 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
                                             //Вводим текст и отображаем в строке ввода на основном экране:
                                             final_text.setText(userInput.getText());
                                             resources = getResources();
-                                            int col = resources.getColor(R.color.backgroundUserCity);
-                                            final_text.setBackgroundColor(col);
+                                            final_text.setBackgroundResource(R.drawable.radius_angle);
                                         }
                                     })
                             .setNegativeButton(R.string.Cancel,
@@ -163,16 +242,45 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         }
     }
 
+
+    @Override
+    public void setDataTime(int index,int temp,String time,String image) {
+
+        listCont.get(index).setBackgroundResource(R.drawable.radius_angle);
+        // listCont.get(index).setBackground(getDrawable(R.drawable.background));
+        if (time.equals(getResources().getString(R.string.t21)) || time.equals(getResources().getString(R.string.t00)) || time.equals(getResources().getString(R.string.t03))) {
+            imageArr.get(index).setImageResource(getImageNight(image));
+        } else {
+            imageArr.get(index).setImageResource(getImage(image));
+        }
+        editTextArr.get(index).setText(time);
+        textViewArr.get(index).setText(temp + getResources().getString(R.string.cur_temp));
+
+    }
+
     @SuppressLint({"SetTextI18n","ResourceType"})
     @Override
-    public void updateWeatherInfo(int temperature,int approximatelyTemperature,String conditionSkym,String image) {
+    public void updateWeatherInfo(int temperature,int approximatelyTemperature,String conditionSkym,String image,String city) {
 
+        logo.setText(getResources().getString(R.string.logo) + " " + city);
         progressBar.setVisibility(View.INVISIBLE);
-        result.setText(getResources().getString(R.string.cur_temp) + temperature);
-        resultFeeling.setText(getResources().getString(R.string.fel_temp) + approximatelyTemperature);
+        result.setText(temperature + getResources().getString(R.string.cur_temp));
+        resultFeeling.setText(getResources().getString(R.string.fel_temp) + " " + approximatelyTemperature + getResources().getString(R.string.cur_temp));
         conditionSky.setText(conditionSkym);
-        imageView.setImageResource(getImage(image));
+        linearLayout.setBackgroundResource(R.drawable.radius_angle);
+        time = Calendar.getInstance();
+        String str = time.getTime().toString().substring(11,13);
+        int hour = Integer.parseInt(str);
+        boolean an = hour <= Integer.parseInt(getResources().getString(R.string.t24).substring(0,2)) || hour >= Integer.parseInt(getResources().getString(R.string.t21).substring(0,2));
+        if (hour >= Integer.parseInt(getResources().getString(R.string.t21).substring(0,2)) || hour >= Integer.parseInt(getResources().getString(R.string.t24).substring(0,2)) ||
+                hour <= Integer.parseInt(getResources().getString(R.string.t03).substring(0,2))) {
+            imageView.setImageResource(getImageNight(image));
+        } else {
+            imageView.setImageResource(getImage(image));
+        }
+
     }
+
 
     @Override
     public void wrongData() {
@@ -223,13 +331,27 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
     public int getImage(String image) {
 
         if (image.equalsIgnoreCase((String) getResources().getString(R.string.partly_cloudy)) || image.equalsIgnoreCase((String) getResources().getString(R.string.some_cloudy))) {
-            return R.drawable.oblako;
+            return R.drawable.sun_figma;
         } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.clean))) {
             return R.drawable.sun;
         } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.cloudy_with_space))) {
             return R.drawable.aun_and_cloud;
-        } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.rain))) {
-            return R.drawable.some_rain;
+        } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.rain)) || image.equalsIgnoreCase(getResources().getString(R.string.mainly_cloudy)) || image.equalsIgnoreCase(getResources().getString(R.string.some_rain))) {
+            return R.drawable.rain;
+        } else {
+            return 0;
+        }
+
+    }
+
+    public int getImageNight(String image) {
+
+        if (image.equalsIgnoreCase((String) getResources().getString(R.string.partly_cloudy)) || image.equalsIgnoreCase((String) getResources().getString(R.string.some_cloudy)) || image.equalsIgnoreCase((String) getResources().getString(R.string.cloudy_with_space))) {
+            return R.drawable.moon_cloud;
+        } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.clean))) {
+            return R.drawable.moon;
+        } else if (image.equalsIgnoreCase((String) getResources().getString(R.string.rain)) || image.equalsIgnoreCase(getResources().getString(R.string.mainly_cloudy)) || image.equalsIgnoreCase(getResources().getString(R.string.some_rain))) {
+            return R.drawable.night_rain;
         } else {
             return 0;
         }

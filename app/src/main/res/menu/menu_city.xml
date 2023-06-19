@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-     android:id="@+id/mainMenu">
+     android:id="@+id/mainMenu"
+    >
 
     <item
         android:id="@+id/subMenu"
-        android:icon="@android:drawable/ic_menu_compass"
+        android:icon="@drawable/geo_transformed"
         android:title="City"
         app:showAsAction="always">
     <menu>
@@ -27,7 +28,10 @@
     <item
         android:id="@+id/newCity"
         android:title="Добавить город"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/plus"
         app:showAsAction="always"
         ></item>
 </menu>
+    <!-- android:icon="@android:drawable/ic_input_add"
+    android:icon="@android:drawable/ic_menu_compass"
+    -->

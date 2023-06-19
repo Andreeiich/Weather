@@ -19,6 +19,28 @@ public class MainData {
     @SerializedName("sys")
     private Sys sys;
 
+    @SerializedName("name")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDt_txt() {
+        return dt_txt;
+    }
+
+    public void setDt_txt(String dt_txt) {
+        this.dt_txt = dt_txt;
+    }
+
+    @SerializedName("dt_txt")
+    private String dt_txt;
+
     private boolean status;
     private boolean errorRequest;
 

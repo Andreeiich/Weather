@@ -1,6 +1,7 @@
 package com.example.weather;
 
 
+import com.example.weather.WeatherModelData.DataHours;
 import com.example.weather.WeatherModelData.MainData;
 import com.example.weather.service.ServiceWeather;
 import com.example.weather.repository.GetDataAPI;
@@ -10,6 +11,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.content.Context;
+
+import java.text.ParseException;
 
 import javax.inject.Inject;
 
@@ -40,10 +43,11 @@ public class MainModel {
                 MainData dataWeather = response.body();
                 if (response.isSuccessful()) {
                     onResult.func(dataWeather);
-                }
-                if (response.code() >= 404) {
+                } else {
                     MainData errorData = new MainData();
                     errorData.setStatus(false);
+                    assert response.errorBody() != null;
+                    errorData.setError(response.errorBody().toString());
                     onResult.func(errorData);
                 }
             }
@@ -57,11 +61,57 @@ public class MainModel {
             }
         });
 
+
+    }
+
+
+    public void sendRequestHours(String city,String units,String language,onResultHours onResultHours) throws RuntimeException {
+        ServiceWeather serviceWeather = new ServiceWeather();
+        GetDataAPI getDataAPIHours = serviceWeather.getRetrofit().create(GetDataAPI.class);
+
+        getDataAPIHours.getDataWeatherDevidedToHours(city,getKey(),units,language,8).enqueue(new Callback<DataHours>() {
+            @Override
+            public void onResponse(Call<DataHours> call,Response<DataHours> response) {
+                DataHours dataHours = response.body();
+
+                if (response.isSuccessful()) {
+                    try {
+                        onResultHours.funcHours(dataHours);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    DataHours errorData = new DataHours();
+                    errorData.setStatus(false);
+                    assert response.errorBody() != null;
+                    errorData.setError(response.errorBody().toString());
+                    try {
+                        onResultHours.funcHours(errorData);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<DataHours> call,Throwable t) {
+
+            }
+        });
+
+
     }
 
     interface onResult {
         void func(MainData weatherData);
 
+    }
+
+    interface onResultHours {
+
+        void funcHours(DataHours dataHours) throws ParseException;
     }
 
 }
